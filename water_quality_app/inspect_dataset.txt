@@ -1,0 +1,7 @@
+import pandas as pd
+
+# Load the new dataset
+df = pd.read_csv('hack_water.csv')
+
+# Print the column names to inspect
+print(df.columns.tolist())  # Print the column names as a list to spot any irregularities

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Water Quality Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <header>
+        <img src="https://enamel.motel6.io/wp-content/uploads/2024/01/Water-Quality.jpg?v=60e0ed9de7" alt="Water Testing Logo" width="100">
+        <h1>Water Quality Prediction</h1>
+    </header>
+
+    <main>
+        <form id="prediction-form" action="/predict" method="POST">
+            <label for="pH">pH Value</label>
+            <input type="number" step="0.01" name="pH" required>
+
+            <label for="Temperature_C">Temperature (°C)</label>
+            <input type="number" step="0.1" name="Temperature_C" required>
+
+            <label for="Turbidity_NTU">Turbidity (NTU)</label>
+            <input type="number" step="0.1" name="Turbidity_NTU" required>
+
+            <label for="Dissolved_Oxygen_mgL">Dissolved Oxygen (mg/L)</label>
+            <input type="number" step="0.1" name="Dissolved_Oxygen_mgL" required>
+
+            <label for="Conductivity_uScm">Conductivity (uS/cm)</label>
+            <input type="number" step="1" name="Conductivity_uScm" required>
+
+            <button type="submit">Predict</button>
+        </form>
+
+        <button id="simulate-sensors">Simulate Sensor Data</button>
+        <button id="sensor-data">Sensor Prediction</button>
+
+        <div id="result-box" class="result-box">
+            <h2>Prediction Results</h2>
+            <div id="result"></div>
+        </div>
+    </main>
+
+    <script>
+// Handle form submission
+document.getElementById('prediction-form').onsubmit = function(event) {
+    event.preventDefault(); // Prevent the default form submission
+
+    const formData = new FormData(this);
+    fetch('/predict', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update the result box with the prediction
+        document.getElementById('result').innerHTML = `<strong>Prediction: ${data.prediction}</strong>`;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = '<strong>Error occurred while making prediction.</strong>';
+    });
+};
+
+// Simulate sensor data
+document.getElementById('simulate-sensors').addEventListener('click', function() {
+    fetch('/simulate_sensors', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Show the feature levels
+        const features = `
+            <p>pH: ${data.data.pH}</p>
+            <p>Temperature (°C): ${data.data.Temperature_C}</p>
+            <p>Turbidity (NTU): ${data.data.Turbidity_NTU}</p>
+            <p>Dissolved Oxygen (mg/L): ${data.data.Dissolved_Oxygen_mgL}</p>
+            <p>Conductivity (uS/cm): ${data.data.Conductivity_uScm}</p>
+        `;
+        // Display the features and the prediction
+        document.getElementById('result').innerHTML = `${features} <strong>Prediction: ${data.prediction}</strong>`;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').innerHTML = '<strong>Error occurred while simulating sensor data.</strong>';
+    });
+});
+</script>
+</body>
+</html>
